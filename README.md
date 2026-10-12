@@ -43,8 +43,11 @@
   ```
   ## Outputs
   - Aggregate loss histogram vs CLT normal approximation
+  ![Aggregate loss histogram vs CLT normal approximation](Figure_1.png)
   - Loss distribution marked with VaR95 and TVaR95
+  ![Loss distribution marked with VaR95 and TVaR95](Figure_2.png)
   - Sensitivity plot: deductible’s impact on E[S] and TVaR95
+  ![Sensitivity plot: deductible’s impact on E[S] and TVaR95](Figure_3.png)
   
   ## Assumptions & Limitations
   - Claims are assumed independent. In reality, catastrophe events can introduce claim correlation and raise portfolio risk.
