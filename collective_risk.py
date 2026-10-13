@@ -28,7 +28,7 @@ theta_pareto = 2000
 
 claim_records = []
 for idx, row in df.iterrows():
-    n_claims = int(row["claim_count"])  # 強制轉整數！報錯
+    n_claims = int(row["claim_count"])  # 強制轉整數！修復報錯
     if n_claims > 0:
         raw_losses = pareto.rvs(b=alpha_pareto, scale=theta_pareto, size=n_claims)
         for loss in raw_losses:
@@ -41,10 +41,10 @@ for idx, row in df.iterrows():
 claim_df = pd.DataFrame(claim_records)
 print(f"總索賠記錄數量: {len(claim_df)}")
 
-# ====================== 2. 加入免賠額deductible d、保單限額 policy limit u ======================
-d = 500    # ordinary deductible 普通免赔
-u = 2500   # 原始损失上限policy limit
-# Y = 实际赔付额
+# ====================== 2. 加入免賠額deductible d、損失上限 policy limit u ======================
+d = 500    # ordinary deductible 
+u = 2500   # 原始損失上限policy limit
+# Y = 實際賠付額
 def payout(raw_x, ded, limit):
     if raw_x <= ded:
         return 0
@@ -55,24 +55,24 @@ def payout(raw_x, ded, limit):
 
 claim_df["Y"] = claim_df["raw_X"].apply(lambda x: payout(x, d, u))
 
-# 计算 E[Y], E[Y^2]（样本估计）
+# 計算E[Y], E[Y^2]（樣本估計）
 EY = claim_df["Y"].mean()
 EY2 = (claim_df["Y"]**2).mean()
-print(f"\n样本估计 E[Y] = {EY:.2f}")
-print(f"样本估计 E[Y²] = {EY2:.2f}")
+print(f"\n樣本估計 E[Y] = {EY:.2f}")
+print(f"樣本估計 E[Y²] = {EY2:.2f}")
 
-# ====================== 3. 线性回归：用risk_score预测severity(raw_X) ======================
+# ====================== 3. linear regression：用risk_score預測severity(raw_X) ======================
 X_reg = claim_df[["risk_score"]].values
 y_reg = claim_df["raw_X"].values
 lr = LinearRegression()
 lr.fit(X_reg, y_reg)
 claim_df["X_pred_lr"] = lr.predict(X_reg)
-print(f"\n线性回归系数(risk_score): {lr.coef_[0]:.2f}, intercept: {lr.intercept_:.2f}")
+print(f"\n線性回歸係數(risk_score): {lr.coef_[0]:.2f}, intercept: {lr.intercept_:.2f}")
 
-# ====================== 4. K-means保单风险分群（原始保单，不是索赔记录） ======================
+# ====================== 4. K-means保單風險分類（原始保單，不是索賠記錄） ======================
 kmeans = KMeans(n_clusters=3, random_state=42, n_init="auto")
 df["risk_cluster"] = kmeans.fit_predict(df[["risk_score"]])
-print("\nK-means 保单风险分组统计：")
+print("\nK-means 保單風險分組統計：")
 print(df["risk_cluster"].value_counts())
 
 # ====================== 5. 复合泊松：蒙特卡洛模拟总损失S ======================
