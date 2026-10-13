@@ -75,9 +75,9 @@ df["risk_cluster"] = kmeans.fit_predict(df[["risk_score"]])
 print("\nK-means 保單風險分組統計：")
 print(df["risk_cluster"].value_counts())
 
-# ====================== 5. 复合泊松：蒙特卡洛模拟总损失S ======================
-sim_times = 10000  # 模拟10000个保单组合周期
-lam_total = df["lambda_i"].sum() # 整个组合总泊松λ
+# ====================== 5. compound poisson：pareto 模擬總損失S ======================
+sim_times = 10000  # 模擬10000個保單組合週期
+lam_total = df["lambda_i"].sum() # 整個組合總poisson λ
 
 S_list = []
 for _ in range(sim_times):
@@ -91,17 +91,17 @@ for _ in range(sim_times):
         S_list.append(S)
 S_arr = np.array(S_list)
 
-# 理论 E[S], Var(S) for compound Poisson
+# 理論值 E[S], Var(S) for compound Poisson
 E_S_theo = lam_total * EY
 Var_S_theo = lam_total * EY2
 E_S_sim = S_arr.mean()
 Var_S_sim = S_arr.var(ddof=1)
 
-print("\n==== 总损失S 理论 vs 蒙特卡洛模拟 ====")
-print(f"理论 E[S] = {E_S_theo:.2f}, 模拟 E[S] = {E_S_sim:.2f}")
-print(f"理论 Var(S) = {Var_S_theo:.2f}, 模拟 Var(S) = {Var_S_sim:.2f}")
+print("\n==== 總損失S 理論值 vs pareto模拟 ====")
+print(f"理論值 E[S] = {E_S_theo:.2f}, 模擬 E[S] = {E_S_sim:.2f}")
+print(f"理論值 Var(S) = {Var_S_theo:.2f}, 模擬 Var(S) = {Var_S_sim:.2f}")
 
-# ====================== 6. CLT正态近似对比 ======================
+# ====================== 6. CLT正態近似對比 ======================
 mu_S = E_S_theo
 sigma_S = np.sqrt(Var_S_theo)
 x_axis = np.linspace(np.min(S_arr), np.max(S_arr), 1000)
@@ -141,7 +141,7 @@ plt.title("Aggregate Loss Distribution with VaR & TVaR")
 plt.legend()
 plt.show()
 
-# ============ 新增：敏感性分析 ============
+# ============ 敏感性分析 ============
 ded_list = [0, 300, 500, 800, 1000]
 tvara_list = []
 ES_list = []
