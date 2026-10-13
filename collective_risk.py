@@ -8,25 +8,27 @@ from sklearn.cluster import KMeans
 plt.rcParams["font.size"] = 10
 np.random.seed(42) # 固定隨機種子確保結果可復現
 
-# ====================== 1. 模拟保单数据集 ======================
-n_policies = 2000 # 总保单数量
-# 协变量：risk_score (1~10，风险越高数值越大)
+# ====================== 1. 模擬保單數據集 ======================
+n_policies = 2000 # 總保單數量
+# risk_score (1~10，數字越大風險越高，索賠頻率越高，與索賠金額無關)
 risk_score = np.random.uniform(1, 10, size=n_policies)
 df = pd.DataFrame({"risk_score": risk_score})
 
-# 索赔频率：泊松参数λ随risk_score上升（风险越高，索赔概率越高）
+
+# 索賠頻率：poisson parameter λ 隨risk_score上升 
 df["lambda_i"] = 0.02 + 0.015 * df["risk_score"]
 
-# 生成每份保单索赔次数 N_i ~ Poisson(lambda_i)
+#生成每份保單的索賠次數 N_i遵循Poisson（lambda_i）
 df["claim_count"] = poisson.rvs(mu=df["lambda_i"], size=n_policies)
 
-# Pareto 参数：alpha=3, theta=2000（和Example16保持一致）
+
+# Pareto parameter : alpha=3 , theta = 2000
 alpha_pareto = 3
 theta_pareto = 2000
 
 claim_records = []
 for idx, row in df.iterrows():
-    n_claims = int(row["claim_count"])  # 强制转整数！修复报错
+    n_claims = int(row["claim_count"])  # 強制轉整數！報錯
     if n_claims > 0:
         raw_losses = pareto.rvs(b=alpha_pareto, scale=theta_pareto, size=n_claims)
         for loss in raw_losses:
@@ -37,9 +39,9 @@ for idx, row in df.iterrows():
             })
 
 claim_df = pd.DataFrame(claim_records)
-print(f"总索赔记录数量: {len(claim_df)}")
+print(f"總索賠記錄數量: {len(claim_df)}")
 
-# ====================== 2. 施加免赔额d、保单限额u ======================
+# ====================== 2. 加入免賠額deductible d、保單限額 policy limit u ======================
 d = 500    # ordinary deductible 普通免赔
 u = 2500   # 原始损失上限policy limit
 # Y = 实际赔付额
