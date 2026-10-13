@@ -6,7 +6,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.cluster import KMeans
 
 plt.rcParams["font.size"] = 10
-np.random.seed(42) # 固定随机种子，保证结果可复现
+np.random.seed(42) # 固定隨機種子確保結果可復現
 
 # ====================== 1. 模拟保单数据集 ======================
 n_policies = 2000 # 总保单数量
@@ -139,7 +139,7 @@ plt.title("Aggregate Loss Distribution with VaR & TVaR")
 plt.legend()
 plt.show()
 
-# ============ 新增：敏感性分析（你扩展的模块！面试亮点） ============
+# ============ 新增：敏感性分析 ============
 ded_list = [0, 300, 500, 800, 1000]
 tvara_list = []
 ES_list = []
